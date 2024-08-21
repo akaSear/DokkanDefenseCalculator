@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Defense Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input[type="number"], button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        #results p {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Defense Calculator</h1>
+
+        <!-- Input fields -->
+        <label for="def">Unit's Defense Stat:</label>
+        <input type="number" id="def">
+
+        <label for="leadSkill">Leader Skill Percentage:</label>
+        <input type="number" id="leadSkill">
+
+        <label for="defPass">Start of Turn Defense:</label>
+        <input type="number" id="defPass">
+
+        <label for="defSupport">Support Defense:</label>
+        <input type="number" id="defSupport">
+
+        <label for="defPLinks">Percentage from Links:</label>
+        <input type="number" id="defPLinks">
+
+        <label for="defFLinks">Flat Defense from Links:</label>
+        <input type="number" id="defFLinks">
+
+        <label for="buDefPass">Defense from Build-ups:</label>
+        <input type="number" id="buDefPass">
+
+        <label for="attackDefense">Defense on Super/Attack:</label>
+        <input type="number" id="attackDefense">
+
+        <label for="saDefense">Defense in SA Effect:</label>
+        <input type="number" id="saDefense">
+
+        <label for="saDefense2">LR 12 Ki SA Effect (if applicable):</label>
+        <input type="number" id="saDefense2">
+
+        <label for="saTimes">Number of Supers per Turn:</label>
+        <input type="number" id="saTimes">
+
+        <!-- Calculate button -->
+        <button id="calculateButton">Calculate</button>
+
+        <!-- Result labels -->
+        <div id="results">
+            <p id="sotDefLabel">SoT Defense: </p>
+            <p id="fullBuiltDefLabel">Fully Built-up SoT Defense: </p>
+            <div id="superDefPanel"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
