@@ -19,7 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Perform calculations
-            const sotDef = Math.floor((def * (leadSkill + 100) / 100) * ((defPass + defSupport + 100) / 100) * ((defPLinks + 100) / 100));
+            const def1 = Math.floor(def * (leadSkill + 100) / 100);
+            const def2 = Math.floor(def1 * (defPass + defSupport + 100) / 100);
+            const sotDef = Math.floor(def2 * (defPLinks + 100) / 100);
+
             const fullBuiltDef = Math.floor(sotDef * (100 + buDefPass) / 100);
             let maxDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
             const staticDef = maxDef;
