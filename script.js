@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const defPass = parseInt(document.getElementById('defPass').value) || 0;
             const defSupport = parseInt(document.getElementById('defSupport').value) || 0;
             const defPLinks = parseInt(document.getElementById('defPLinks').value) || 0;
+            const actSkill = parseInt(document.getElementById('actSkill').value) || 0;
             const buDefPass = parseInt(document.getElementById('buDefPass').value) || 0;
             const attackDefense = parseInt(document.getElementById('attackDefense').value) || 0;
             const saDefense = parseInt(document.getElementById('saDefense').value) || 0;
@@ -23,7 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const def2 = Math.floor(def1 * (defPass + defSupport + 100) / 100);
             const sotDef = Math.floor(def2 * (defPLinks + 100) / 100);
 
-            const fullBuiltDef = Math.floor(sotDef * (100 + buDefPass) / 100);
+            const actDef = Math.floor(sotDef * (actSkill + 100) / 100);
+
+            const fullBuiltDef = Math.floor(actDef * (100 + buDefPass) / 100);
             let maxDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
             const staticDef = maxDef;
 
