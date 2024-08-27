@@ -13,17 +13,18 @@
             justify-content: center;
             align-items: flex-start;
             height: 100vh;
-            background-color: #f4f4f4;
+            background-color: #1e1e1e; /* Dark background color */
+            color: #f4f4f4; /* Light text color */
             box-sizing: border-box;
         }
         .container {
             width: 100%;
             max-width: 500px;
-            background: #fff;
+            background: #333; /* Dark container background */
             padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             border-radius: 8px;
-            margin-top: 30px; /* Adjust this value as needed */
+            margin-top: 30px;
         }
         h1 {
             text-align: center;
@@ -38,9 +39,11 @@
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid #555; /* Dark border color */
             border-radius: 4px;
             box-sizing: border-box;
+            background-color: #444; /* Dark input background */
+            color: #f4f4f4; /* Light input text color */
         }
         button {
             background-color: #28a745;
@@ -81,7 +84,6 @@
         <label for="defPLinks">Percentage from Links:</label>
         <input type="number" id="defPLinks">
 
-        <!-- New input for Active Skill Buff -->
         <label for="actSkill">Active Skill Buff Percentage:</label>
         <input type="number" id="actSkill">
 
