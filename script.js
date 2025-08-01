@@ -111,6 +111,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             alert("An error occurred: " + error.message);
-        }
+        }z
     });
 });
