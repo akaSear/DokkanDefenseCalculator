@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('calculateButton').addEventListener('click', () => {
         try {
-            // Retrieve input values from the DOM
+            // Retrieve input values
             const def = parseInt(document.getElementById('def').value) || 0;
             const leadSkill = parseInt(document.getElementById('leadSkill').value) || 0;
             const defPass = parseInt(document.getElementById('defPass').value) || 0;
@@ -12,54 +12,70 @@ document.addEventListener('DOMContentLoaded', () => {
             const attackDefense = parseInt(document.getElementById('attackDefense').value) || 0;
             const saDefense = parseInt(document.getElementById('saDefense').value) || 0;
             const saDefense2 = parseInt(document.getElementById('saDefense2').value) || 0;
-            const saTimes = parseInt(document.getElementById('saTimes').value) || 0;
+            const saTimes = parseInt(document.getElementById('saTimes').value) || 1;
+            const pastSupers = parseInt(document.getElementById('pastSupers').value) || 0;
 
             if (saTimes === 0) {
                 alert("Number of Supers per Turn cannot be 0");
                 return;
             }
 
-            // Perform calculations
+            // Base calculations (unchanged)
             const def1 = Math.floor(def * (leadSkill + 100) / 100);
             const def2 = Math.floor(def1 * (defPass + defSupport + 100) / 100);
             const sotDef = Math.floor(def2 * (defPLinks + 100) / 100);
-
             const actDef = Math.floor(sotDef * (actSkill + 100) / 100);
-
             const fullBuiltDef = Math.floor(actDef * (100 + buDefPass) / 100);
-            let maxDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
-            const staticDef = maxDef;
+            const staticDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
 
+            // Calculate stacks from past supers
+            const pastStacks = pastSupers > 0 ? 
+                (saDefense2 > 0 ? 
+                    // For varying stacks (30% + 50% + 70% etc)
+                    saDefense + saDefense2 * (pastSupers - 1) : 
+                    // For linear stacks (30% each)
+                    saDefense * pastSupers
+                ) : 0;
+
+            // Calculate current turn's supers
             const superDefs = [];
             for (let i = 0; i < saTimes; i++) {
-                let currentDef;
+                let currentStack;
                 if (i === 0) {
-                    currentDef = Math.floor(staticDef * (100 + saDefense) / 100);
+                    currentStack = saDefense;
                 } else if (saDefense2 > 0) {
-                    currentDef = Math.floor(staticDef * (100 + saDefense + (saDefense2 * i)) / 100);
+                    currentStack = saDefense + (saDefense2 * i);
                 } else {
-                    currentDef = Math.floor(staticDef * (100 + saDefense * (i + 1)) / 100);
+                    currentStack = saDefense * (i + 1);
                 }
-                superDefs.push(currentDef);
+                
+                const totalStacks = pastStacks + currentStack;
+                superDefs.push(Math.floor(staticDef * (100 + totalStacks) / 100));
             }
 
-            // Display results in the DOM
-            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef;
-            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef;
+            // Display results (unchanged format)
+            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString();
+            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
 
             const superDefPanel = document.getElementById('superDefPanel');
             superDefPanel.innerHTML = '';
+            
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
-                p.innerText = `Defense after ${index + 1} Super(s): ${def}`;
+                p.innerText = `Defense after ${index + 1} Super(s): ${def.toLocaleString()}`;
                 superDefPanel.appendChild(p);
             });
 
-            // Calculate and display Max Possible Defense after all supers
-            maxDef = superDefs[superDefs.length - 1];
-            const maxDefLabel = document.createElement('p');
-            maxDefLabel.innerText = "Max Possible Defense: " + maxDef;
-            superDefPanel.appendChild(maxDefLabel);
+            // Show total stacks (new)
+            const totalStacksUsed = pastStacks + 
+                (saDefense2 > 0 ? 
+                    saDefense + saDefense2 * (saTimes - 1) : 
+                    saDefense * saTimes
+                );
+            
+            const stackInfo = document.createElement('p');
+            stackInfo.innerText = `Total Stacks Applied: ${totalStacksUsed}%`;
+            superDefPanel.appendChild(stackInfo);
 
         } catch (error) {
             alert("An error occurred: " + error.message);
