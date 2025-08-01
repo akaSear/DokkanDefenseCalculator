@@ -1,118 +1,141 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@SearLV's Defense Calculator</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            height: 100vh;
-            background-color: #1e1e1e; /* Dark background color */
-            color: #f4f4f4; /* Light text color */
-            box-sizing: border-box;
+// Add these variables at the top of your script
+let totalStacks = 0;
+let currentTurn = 1;
+
+// Add these input fields to your HTML (or create them dynamically)
+/*
+<div>
+    <label for="turnsElapsed">Turns Elapsed (for stacking):</label>
+    <input type="number" id="turnsElapsed" min="0" value="0">
+</div>
+<div>
+    <label for="stacksFromPrevTurns">Stacks from Previous Turns (%):</label>
+    <input type="number" id="stacksFromPrevTurns" min="0" value="0">
+</div>
+*/
+
+// Modified calculateDefense function
+function calculateDefense() {
+    try {
+        // Existing input retrieval
+        const def = getInputValue('def');
+        // ... (other existing inputs)
+        const saTimes = getInputValue('saTimes');
+        const turnsElapsed = getInputValue('turnsElapsed');
+        const stacksFromPrevTurns = getInputValue('stacksFromPrevTurns');
+
+        // Validate inputs
+        if (saTimes <= 0) {
+            alert("Number of Supers per Turn must be at least 1");
+            return;
         }
-        .container {
-            width: 100%;
-            max-width: 500px;
-            background: #333; /* Dark container background */
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            margin-top: 30px;
+
+        if (def <= 0) {
+            alert("Base Defense must be greater than 0");
+            return;
         }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
+
+        // Calculate base defense (same as before)
+        const leaderSkillApplied = Math.floor(def * (leadSkill + 100) / 100);
+        const passiveAndSupportApplied = Math.floor(leaderSkillApplied * (defPass + defSupport + 100) / 100);
+        const startOfTurnDefense = Math.floor(passiveAndSupportApplied * (defPLinks + 100) / 100);
+        const activeSkillApplied = Math.floor(startOfTurnDefense * (actSkill + 100) / 100);
+        const fullyBuiltDefense = Math.floor(activeSkillApplied * (100 + buDefPass) / 100);
+        const attackDefenseApplied = Math.floor(fullyBuiltDefense * (100 + attackDefense) / 100);
+        const staticDefense = attackDefenseApplied;
+
+        // Calculate total stacks from previous turns
+        // If manual input is provided, use that, otherwise use our tracked totalStacks
+        const previousStacks = stacksFromPrevTurns > 0 ? stacksFromPrevTurns : totalStacks;
+        
+        // Calculate defense for this turn's super attacks
+        const superDefenses = [];
+        for (let i = 0; i < saTimes; i++) {
+            let currentDefense;
+            const stacksThisSA = i === 0 ? saDefense : (saDefense2 > 0 ? saDefense + (saDefense2 * i) : saDefense * (i + 1));
+            const totalStacksThisTurn = previousStacks + stacksThisSA;
+            
+            currentDefense = Math.floor(staticDefense * (100 + totalStacksThisTurn) / 100);
+            superDefenses.push(currentDefense);
         }
-        label {
-            display: block;
-            margin: 10px 0 5px;
-            font-weight: bold;
-        }
-        input[type="number"], button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #555; /* Dark border color */
-            border-radius: 4px;
-            box-sizing: border-box;
-            background-color: #444; /* Dark input background */
-            color: #f4f4f4; /* Light input text color */
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        #results {
-            margin-top: 20px;
-        }
-        #results p {
-            margin: 5px 0;
-            font-weight: bold;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>@SearLV's Defense Calculator</h1>
 
-        <!-- Input fields -->
-        <label for="def">Unit's Defense Stat:</label>
-        <input type="number" id="def">
+        // Update our stacking tracker for next turn
+        const finalStacksThisTurn = saDefense2 > 0 
+            ? saDefense + (saDefense2 * (saTimes - 1))
+            : saDefense * saTimes;
+        
+        totalStacks = previousStacks + finalStacksThisTurn;
+        currentTurn++;
 
-        <label for="leadSkill">Leader Skill Percentage:</label>
-        <input type="number" id="leadSkill">
+        // Display results
+        updateResults({
+            startOfTurnDefense,
+            fullyBuiltDefense,
+            superDefenses,
+            maxDefense: superDefenses[superDefenses.length - 1],
+            totalStacks,
+            currentTurn
+        });
 
-        <label for="defPass">Start of Turn Defense:</label>
-        <input type="number" id="defPass">
+    } catch (error) {
+        console.error("Calculation error:", error);
+        alert("An error occurred during calculation. Please check your inputs and try again.");
+    }
+}
 
-        <label for="defSupport">Support Defense:</label>
-        <input type="number" id="defSupport">
+// Modified updateResults function
+function updateResults(results) {
+    const { 
+        startOfTurnDefense, 
+        fullyBuiltDefense,
+        superDefenses,
+        maxDefense,
+        totalStacks,
+        currentTurn
+    } = results;
+    
+    const formatNumber = num => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
-        <label for="defPLinks">Percentage from Links:</label>
-        <input type="number" id="defPLinks">
+    document.getElementById('sotDefLabel').textContent = `Start of Turn Defense: ${formatNumber(startOfTurnDefense)}`;
+    document.getElementById('fullBuiltDefLabel').textContent = `Fully Built-up Defense: ${formatNumber(fullyBuiltDefense)}`;
 
-        <label for="actSkill">Active Skill Buff Percentage:</label>
-        <input type="number" id="actSkill">
+    const superDefPanel = document.getElementById('superDefPanel');
+    superDefPanel.innerHTML = '';
+    
+    superDefenses.forEach((defense, index) => {
+        const p = document.createElement('p');
+        p.textContent = `Defense after ${index + 1} Super Attack${index > 0 ? 's' : ''}: ${formatNumber(defense)}`;
+        superDefPanel.appendChild(p);
+    });
 
-        <label for="buDefPass">Defense from Build-ups:</label>
-        <input type="number" id="buDefPass">
+    const maxDefLabel = document.createElement('p');
+    maxDefLabel.className = 'max-defense';
+    maxDefLabel.textContent = `Maximum Possible Defense: ${formatNumber(maxDefense)}`;
+    superDefPanel.appendChild(maxDefLabel);
 
-        <label for="attackDefense">Defense on Super/Attack:</label>
-        <input type="number" id="attackDefense">
+    // Add stacking information
+    const stackInfo = document.createElement('p');
+    stackInfo.className = 'stack-info';
+    stackInfo.textContent = `Total Stacks after this turn: ${totalStacks}% (Turn ${currentTurn})`;
+    superDefPanel.appendChild(stackInfo);
 
-        <label for="saDefense">Defense in SA Effect:</label>
-        <input type="number" id="saDefense">
+    // Add a button to simulate next turn
+    const nextTurnBtn = document.createElement('button');
+    nextTurnBtn.textContent = 'Simulate Next Turn';
+    nextTurnBtn.addEventListener('click', () => {
+        document.getElementById('stacksFromPrevTurns').value = totalStacks;
+        document.getElementById('turnsElapsed').value = currentTurn;
+        calculateDefense();
+    });
+    superDefPanel.appendChild(nextTurnBtn);
+}
 
-        <label for="saDefense2">LR 12 Ki SA Effect (if applicable):</label>
-        <input type="number" id="saDefense2">
-
-        <label for="saTimes">Number of Supers per Turn:</label>
-        <input type="number" id="saTimes">
-
-        <!-- Calculate button -->
-        <button id="calculateButton">Calculate</button>
-
-        <!-- Result labels -->
-        <div id="results">
-            <p id="sotDefLabel">SoT Defense: </p>
-            <p id="fullBuiltDefLabel">Fully Built-up SoT Defense: </p>
-            <div id="superDefPanel"></div>
-        </div>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
+// Add reset function
+function resetCalculator() {
+    totalStacks = 0;
+    currentTurn = 1;
+    inputFields.forEach(fieldId => {
+        document.getElementById(fieldId).value = '';
+    });
+    document.getElementById('superDefPanel').innerHTML = '';
+}
