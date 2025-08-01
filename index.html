@@ -1,116 +1,145 @@
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('calculateButton').addEventListener('click', () => {
-        try {
-            // Retrieve all input values
-            const def = parseInt(document.getElementById('def').value) || 0;
-            const leadSkill = parseInt(document.getElementById('leadSkill').value) || 0;
-            const defPass = parseInt(document.getElementById('defPass').value) || 0;
-            const defSupport = parseInt(document.getElementById('defSupport').value) || 0;
-            const defPLinks = parseInt(document.getElementById('defPLinks').value) || 0;
-            const actSkill = parseInt(document.getElementById('actSkill').value) || 0;
-            const buDefPass = parseInt(document.getElementById('buDefPass').value) || 0;
-            const attackDefense = parseInt(document.getElementById('attackDefense').value) || 0;
-            const saDefense = parseInt(document.getElementById('saDefense').value) || 0;
-            const saDefense2 = parseInt(document.getElementById('saDefense2').value) || 0;
-            const saTimes = parseInt(document.getElementById('saTimes').value) || 1;
-            const pastSupers = parseInt(document.getElementById('pastSupers').value) || 0;
-            const teamStackerBuff = parseInt(document.getElementById('teamStacker').value) || 0;
-            const teamStackerCount = parseInt(document.getElementById('teamStackerCount').value) || 0;
-            const defOnReceiving = parseInt(document.getElementById('defOnReceiving').value) || 0;
-
-            if (saTimes === 0) {
-                alert("Number of Supers per Turn cannot be 0");
-                return;
-            }
-
-            // Base defense calculations
-            const def1 = Math.floor(def * (leadSkill + 100) / 100);
-            const def2 = Math.floor(def1 * (defPass + defSupport + 100) / 100);
-            const sotDef = Math.floor(def2 * (defPLinks + 100) / 100);
-            const actDef = Math.floor(sotDef * (actSkill + 100) / 100);
-            const fullBuiltDef = Math.floor(actDef * (100 + buDefPass) / 100);
-            const staticDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
-
-            // Stack calculations
-            const teamStacks = teamStackerBuff * teamStackerCount;
-            const pastStacks = pastSupers > 0 ? 
-                (saDefense2 > 0 ? 
-                    saDefense + saDefense2 * (pastSupers - 1) : 
-                    saDefense * pastSupers
-                ) : 0;
-
-            // Calculate defense for each super
-            const superDefs = [];
-            for (let i = 0; i < saTimes; i++) {
-                let currentStack;
-                if (i === 0) {
-                    currentStack = saDefense;
-                } else if (saDefense2 > 0) {
-                    currentStack = saDefense + (saDefense2 * i);
-                } else {
-                    currentStack = saDefense * (i + 1);
-                }
-                
-                const totalStacks = pastStacks + currentStack + teamStacks;
-                let finalDef = Math.floor(staticDef * (100 + totalStacks) / 100);
-                
-                if (defOnReceiving > 0) {
-                    finalDef = Math.floor(finalDef * (100 + defOnReceiving) / 100);
-                }
-                
-                superDefs.push({
-                    value: finalDef,
-                    base: Math.floor(staticDef * (100 + totalStacks) / 100),
-                    buffAmount: defOnReceiving > 0 ? 
-                        Math.floor(finalDef - (finalDef / (1 + defOnReceiving/100))) : 0
-                });
-            }
-
-            // Display results
-            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString();
-            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
-
-            // Calculate Defense After Receiving Hit (Before SA)
-            // Includes pastStacks and teamStacks, but NOT current turn's SA effect
-            let preSuperDefBase = Math.floor(staticDef * (100 + pastStacks + teamStacks) / 100);
-            let preSuperDef = preSuperDefBase;
-            if (defOnReceiving > 0) {
-                preSuperDef = Math.floor(preSuperDefBase * (100 + defOnReceiving) / 100);
-            }
-            document.getElementById('preSuperDefLabel').innerText =
-                "Defense After Receiving Hit (Before SA): " + preSuperDef.toLocaleString();
-
-            const superDefPanel = document.getElementById('superDefPanel');
-            superDefPanel.innerHTML = '';
-
-            superDefs.forEach((def, index) => {
-                const p = document.createElement('p');
-                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString()}</strong>`;
-                if (defOnReceiving > 0) {
-                    defText += `<span class="breakdown">
-                        (Base: ${def.base.toLocaleString()} + 
-                        ${defOnReceiving}% when attacked: +${def.buffAmount.toLocaleString()})
-                    </span>`;
-                }
-                p.innerHTML = defText;
-                superDefPanel.appendChild(p);
-            });
-
-            // Show total stacks if any
-            const totalStacksUsed = pastStacks +
-                (saDefense2 > 0 ?
-                    saDefense + saDefense2 * (saTimes - 1) :
-                    saDefense * saTimes
-                ) + teamStacks;
-
-            if (totalStacksUsed > 0) {
-                const stackInfo = document.createElement('p');
-                stackInfo.innerHTML = `Total Stacks Applied: <strong>${totalStacksUsed}%</strong>`;
-                superDefPanel.appendChild(stackInfo);
-            }
-
-        } catch (error) {
-            alert("An error occurred: " + error.message);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@SearLV's Defense Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            background-color: #1e1e1e;
+            color: #f4f4f4;
+            box-sizing: border-box;
         }
-    });
-});
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: #333;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input[type="number"], button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #444;
+            color: #f4f4f4;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        #results p {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+        /* NEW: Breakdown styling */
+        .breakdown {
+            display: block;
+            font-size: 0.85em;
+            color: #aaa;
+            margin-top: 3px;
+            line-height: 1.4;
+        }
+        #superDefPanel p {
+            padding: 8px 0;
+            border-bottom: 1px solid #444;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>@SearLV's Defense Calculator</h1>
+
+        <!-- Input fields -->
+        <label for="def">Unit's Defense Stat:</label>
+        <input type="number" id="def">
+
+        <label for="leadSkill">Leader Skill Percentage:</label>
+        <input type="number" id="leadSkill">
+
+        <label for="defPass">Start of Turn Defense:</label>
+        <input type="number" id="defPass">
+
+        <label for="defSupport">Support Defense:</label>
+        <input type="number" id="defSupport">
+
+        <label for="defPLinks">Percentage from Links:</label>
+        <input type="number" id="defPLinks">
+
+        <label for="actSkill">Active Skill Buff Percentage:</label>
+        <input type="number" id="actSkill">
+
+        <label for="buDefPass">Defense from Build-ups:</label>
+        <input type="number" id="buDefPass">
+
+        <label for="attackDefense">Defense on Super/Attack:</label>
+        <input type="number" id="attackDefense">
+
+        <label for="saDefense">Defense in SA Effect:</label>
+        <input type="number" id="saDefense">
+
+        <label for="saDefense2">LR 12 Ki SA Effect (if applicable):</label>
+        <input type="number" id="saDefense2">
+
+        <label for="saTimes">Number of Supers per Turn:</label>
+        <input type="number" id="saTimes" value="1">
+
+        <!-- NEW: Past supers and team stacking -->
+        <label for="pastSupers">Past Super Attacks (Count):</label>
+        <input type="number" id="pastSupers" value="0" min="0">
+
+        <label for="teamStacker">Team Stacker's 18Ki SA Buff (%):</label>
+        <input type="number" id="teamStacker" value="0">
+
+        <label for="teamStackerCount">Team Stacker Supers:</label>
+        <input type="number" id="teamStackerCount" value="0" min="0">
+
+        <!-- NEW: Defense when attacked -->
+        <label for="defOnReceiving">Defense when Attacked (%):</label>
+        <input type="number" id="defOnReceiving" value="0">
+
+        <!-- Calculate button -->
+        <button id="calculateButton">Calculate</button>
+
+        <!-- Results -->
+        <div id="results">
+            <p id="sotDefLabel">SoT Defense: </p>
+            <p id="fullBuiltDefLabel">Fully Built-up SoT Defense: </p>
+            <p id="preSuperDefLabel">Defense After Receiving Hit (Before SA): </p>
+            <div id="superDefPanel"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
