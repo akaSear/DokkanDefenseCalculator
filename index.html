@@ -70,8 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString();
             document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
 
-            // NEW: Calculate Defense After Receiving Hit (Before SA)
-            // Include pastStacks and teamStacks in the calculation
+            // Calculate Defense After Receiving Hit (Before SA)
+            // Includes pastStacks and teamStacks, but NOT current turn's SA effect
             let preSuperDefBase = Math.floor(staticDef * (100 + pastStacks + teamStacks) / 100);
             let preSuperDef = preSuperDefBase;
             if (defOnReceiving > 0) {
@@ -82,29 +82,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const superDefPanel = document.getElementById('superDefPanel');
             superDefPanel.innerHTML = '';
-            
+
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
                 let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString()}</strong>`;
-                
                 if (defOnReceiving > 0) {
                     defText += `<span class="breakdown">
                         (Base: ${def.base.toLocaleString()} + 
                         ${defOnReceiving}% when attacked: +${def.buffAmount.toLocaleString()})
                     </span>`;
                 }
-                
                 p.innerHTML = defText;
                 superDefPanel.appendChild(p);
             });
 
             // Show total stacks if any
-            const totalStacksUsed = pastStacks + 
-                (saDefense2 > 0 ? 
-                    saDefense + saDefense2 * (saTimes - 1) : 
+            const totalStacksUsed = pastStacks +
+                (saDefense2 > 0 ?
+                    saDefense + saDefense2 * (saTimes - 1) :
                     saDefense * saTimes
                 ) + teamStacks;
-            
+
             if (totalStacksUsed > 0) {
                 const stackInfo = document.createElement('p');
                 stackInfo.innerHTML = `Total Stacks Applied: <strong>${totalStacksUsed}%</strong>`;
