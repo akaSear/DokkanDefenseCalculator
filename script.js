@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('calculateButton').addEventListener('click', () => {
         try {
-            // Retrieve all input values
+            // Input collection
             const getValue = id => parseInt(document.getElementById(id).value) || 0;
             
             const def = getValue('def');
@@ -16,8 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const saDefense2 = getValue('saDefense2');
             const saTimes = getValue('saTimes');
             const pastSupers = getValue('pastSupers');
-            const teamStackerBuff = getValue('teamStacker');
-            const teamStackerCount = getValue('teamStackerCount');
             const defOnReceiving = getValue('defOnReceiving');
 
             if (saTimes < 1) {
@@ -25,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Base defense calculations
+            // Base calculations
             const sotDef = Math.floor(def * (leadSkill + 100) / 100 * (defPass + defSupport + 100) / 100 * (defPLinks + 100) / 100);
             const fullBuiltDef = Math.floor(sotDef * (actSkill + 100) / 100 * (100 + buDefPass) / 100);
             const preSuperDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
@@ -43,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('fullBuiltDefLabel').innerHTML = builtUpText;
 
             // Calculate super attack defenses
-            const teamStacks = teamStackerBuff * teamStackerCount;
             const pastStacks = pastSupers > 0 
                 ? (saDefense2 > 0 
                     ? saDefense + saDefense2 * (pastSupers - 1) 
@@ -58,8 +55,17 @@ document.addEventListener('DOMContentLoaded', () => {
                         ? saDefense + (saDefense2 * i) 
                         : saDefense * (i + 1));
                 
-                const totalStacks = pastStacks + currentStack + teamStacks;
-                superDefs.push(Math.floor(preSuperDef * (100 + totalStacks) / 100));
+                const totalStacks = pastStacks + currentStack;
+                const baseDef = Math.floor(preSuperDef * (100 + totalStacks) / 100);
+                const finalDef = defOnReceiving > 0
+                    ? Math.floor(baseDef * (100 + defOnReceiving) / 100)
+                    : baseDef;
+                
+                superDefs.push({
+                    value: finalDef,
+                    base: baseDef,
+                    buffAmount: defOnReceiving > 0 ? finalDef - baseDef : 0
+                });
             }
 
             // Display results
@@ -68,22 +74,18 @@ document.addEventListener('DOMContentLoaded', () => {
             
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
-                p.innerHTML = `Defense after ${index + 1} Super(s): <strong>${def.toLocaleString()}</strong>`;
+                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString()}</strong>`;
+                
+                if (defOnReceiving > 0) {
+                    defText += `<span class="breakdown">
+                        (Base: ${def.base.toLocaleString()} + 
+                        ${defOnReceiving}% when attacked: +${def.buffAmount.toLocaleString()})
+                    </span>`;
+                }
+                
+                p.innerHTML = defText;
                 superDefPanel.appendChild(p);
             });
-
-            // Show total stacks if applicable
-            const totalStacks = pastStacks + 
-                (saDefense2 > 0 
-                    ? saDefense + saDefense2 * (saTimes - 1) 
-                    : saDefense * saTimes) + 
-                teamStacks;
-            
-            if (totalStacks > 0) {
-                const stackInfo = document.createElement('p');
-                stackInfo.innerHTML = `Total Stacks: <strong>${totalStacks}%</strong>`;
-                superDefPanel.appendChild(stackInfo);
-            }
 
         } catch (error) {
             alert("An error occurred: " + error.message);
