@@ -1,74 +1,75 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('calculateButton').addEventListener('click', () => {
         try {
-            // Input collection
-            const getValue = id => parseInt(document.getElementById(id).value) || 0;
-            
-            const def = getValue('def');
-            const leadSkill = getValue('leadSkill');
-            const defPass = getValue('defPass');
-            const defSupport = getValue('defSupport');
-            const defPLinks = getValue('defPLinks');
-            const actSkill = getValue('actSkill');
-            const buDefPass = getValue('buDefPass');
-            const attackDefense = getValue('attackDefense');
-            const saDefense = getValue('saDefense');
-            const saDefense2 = getValue('saDefense2');
-            const saTimes = getValue('saTimes');
-            const pastSupers = getValue('pastSupers');
-            const defOnReceiving = getValue('defOnReceiving');
+            // Retrieve all input values
+            const def = parseInt(document.getElementById('def').value) || 0;
+            const leadSkill = parseInt(document.getElementById('leadSkill').value) || 0;
+            const defPass = parseInt(document.getElementById('defPass').value) || 0;
+            const defSupport = parseInt(document.getElementById('defSupport').value) || 0;
+            const defPLinks = parseInt(document.getElementById('defPLinks').value) || 0;
+            const actSkill = parseInt(document.getElementById('actSkill').value) || 0;
+            const buDefPass = parseInt(document.getElementById('buDefPass').value) || 0;
+            const attackDefense = parseInt(document.getElementById('attackDefense').value) || 0;
+            const saDefense = parseInt(document.getElementById('saDefense').value) || 0;
+            const saDefense2 = parseInt(document.getElementById('saDefense2').value) || 0;
+            const saTimes = parseInt(document.getElementById('saTimes').value) || 1;
+            const pastSupers = parseInt(document.getElementById('pastSupers').value) || 0;
+            const teamStackerBuff = parseInt(document.getElementById('teamStacker').value) || 0;
+            const teamStackerCount = parseInt(document.getElementById('teamStackerCount').value) || 0;
+            const defOnReceiving = parseInt(document.getElementById('defOnReceiving').value) || 0;
 
-            if (saTimes < 1) {
-                alert("Number of Supers must be at least 1");
+            if (saTimes === 0) {
+                alert("Number of Supers per Turn cannot be 0");
                 return;
             }
 
-            // Base calculations
-            const sotDef = Math.floor(def * (leadSkill + 100) / 100 * (defPass + defSupport + 100) / 100 * (defPLinks + 100) / 100);
-            const fullBuiltDef = Math.floor(sotDef * (actSkill + 100) / 100 * (100 + buDefPass) / 100);
-            const preSuperDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
-            const preSuperDefWithBuff = defOnReceiving > 0 
-                ? Math.floor(fullBuiltDef * (100 + attackDefense + defOnReceiving) / 100)
-                : preSuperDef;
+            // Base defense calculations
+            const def1 = Math.floor(def * (leadSkill + 100) / 100);
+            const def2 = Math.floor(def1 * (defPass + defSupport + 100) / 100);
+            const sotDef = Math.floor(def2 * (defPLinks + 100) / 100);
+            const actDef = Math.floor(sotDef * (actSkill + 100) / 100);
+            const fullBuiltDef = Math.floor(actDef * (100 + buDefPass) / 100);
+            const staticDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
 
-            // Display base stats
-            document.getElementById('sotDefLabel').innerText = `SoT Defense: ${sotDef.toLocaleString()}`;
-            
-            let builtUpText = `Fully Built-up Defense: ${fullBuiltDef.toLocaleString()}`;
-            if (defOnReceiving > 0) {
-                builtUpText += ` <span class="buff-note">(When Attacked: ${preSuperDefWithBuff.toLocaleString()})</span>`;
-            }
-            document.getElementById('fullBuiltDefLabel').innerHTML = builtUpText;
+            // Stack calculations
+            const teamStacks = teamStackerBuff * teamStackerCount;
+            const pastStacks = pastSupers > 0 ? 
+                (saDefense2 > 0 ? 
+                    saDefense + saDefense2 * (pastSupers - 1) : 
+                    saDefense * pastSupers
+                ) : 0;
 
-            // Calculate super attack defenses
-            const pastStacks = pastSupers > 0 
-                ? (saDefense2 > 0 
-                    ? saDefense + saDefense2 * (pastSupers - 1) 
-                    : saDefense * pastSupers)
-                : 0;
-
+            // Calculate defense for each super
             const superDefs = [];
             for (let i = 0; i < saTimes; i++) {
-                const currentStack = i === 0 
-                    ? saDefense 
-                    : (saDefense2 > 0 
-                        ? saDefense + (saDefense2 * i) 
-                        : saDefense * (i + 1));
+                let currentStack;
+                if (i === 0) {
+                    currentStack = saDefense;
+                } else if (saDefense2 > 0) {
+                    currentStack = saDefense + (saDefense2 * i);
+                } else {
+                    currentStack = saDefense * (i + 1);
+                }
                 
-                const totalStacks = pastStacks + currentStack;
-                const baseDef = Math.floor(preSuperDef * (100 + totalStacks) / 100);
-                const finalDef = defOnReceiving > 0
-                    ? Math.floor(baseDef * (100 + defOnReceiving) / 100)
-                    : baseDef;
+                const totalStacks = pastStacks + currentStack + teamStacks;
+                let finalDef = Math.floor(staticDef * (100 + totalStacks) / 100);
+                
+                if (defOnReceiving > 0) {
+                    finalDef = Math.floor(finalDef * (100 + defOnReceiving) / 100);
+                }
                 
                 superDefs.push({
                     value: finalDef,
-                    base: baseDef,
-                    buffAmount: defOnReceiving > 0 ? finalDef - baseDef : 0
+                    base: Math.floor(staticDef * (100 + totalStacks) / 100),
+                    buffAmount: defOnReceiving > 0 ? 
+                        Math.floor(finalDef - (finalDef / (1 + defOnReceiving/100))) : 0
                 });
             }
 
             // Display results
+            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString();
+            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
+
             const superDefPanel = document.getElementById('superDefPanel');
             superDefPanel.innerHTML = '';
             
@@ -86,6 +87,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 p.innerHTML = defText;
                 superDefPanel.appendChild(p);
             });
+
+            // Show total stacks if any
+            const totalStacksUsed = pastStacks + 
+                (saDefense2 > 0 ? 
+                    saDefense + saDefense2 * (saTimes - 1) : 
+                    saDefense * saTimes
+                ) + teamStacks;
+            
+            if (totalStacksUsed > 0) {
+                const stackInfo = document.createElement('p');
+                stackInfo.innerHTML = `Total Stacks Applied: <strong>${totalStacksUsed}%</strong>`;
+                superDefPanel.appendChild(stackInfo);
+            }
 
         } catch (error) {
             alert("An error occurred: " + error.message);
