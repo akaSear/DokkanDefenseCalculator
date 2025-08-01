@@ -26,43 +26,74 @@
             border-radius: 8px;
             margin-top: 30px;
         }
-        /* ... (keep all your existing styles) ... */
-        .when-attacked {
-            color: #FFD700;
-            font-weight: normal;
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
         }
-        .breakdown {
+        label {
             display: block;
-            font-size: 0.85em;
-            color: #aaa;
-            margin-top: 3px;
+            margin: 10px 0 5px;
+            font-weight: bold;
+        }
+        input[type="number"], button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #444;
+            color: #f4f4f4;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #results {
+            margin-top: 20px;
+        }
+        #results p {
+            margin: 5px 0;
+            font-weight: bold;
+        }
+        /* Minimal addition for "when attacked" text */
+        .buff-note {
+            color: #FFD700;
+            font-size: 0.9em;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>@SearLV's Defense Calculator</h1>
-        
-        <!-- Input fields (unchanged from your original) -->
+
+        <!-- Your original inputs -->
         <label for="def">Unit's Defense Stat:</label>
         <input type="number" id="def">
-        <!-- ... (all other existing inputs) ... -->
         
-        <!-- New stacking inputs -->
-        <label for="pastSupers">Past Super Attacks (Count):</label>
+        <!-- ... (all your original input fields) ... -->
+
+        <!-- New stacking inputs (minimal additions) -->
+        <label for="pastSupers">Past Super Attacks:</label>
         <input type="number" id="pastSupers" value="0" min="0">
-        
-        <label for="teamStacker">Team Stacker's 18Ki SA Buff (%):</label>
+
+        <label for="teamStacker">Team Stacker Buff (%):</label>
         <input type="number" id="teamStacker" value="0">
-        
+
         <label for="teamStackerCount">Team Stacker Supers:</label>
         <input type="number" id="teamStackerCount" value="0" min="0">
-        
+
         <label for="defOnReceiving">Defense when Attacked (%):</label>
         <input type="number" id="defOnReceiving" value="0">
-        
+
         <button id="calculateButton">Calculate</button>
-        
+
         <div id="results">
             <p id="sotDefLabel">SoT Defense: </p>
             <p id="fullBuiltDefLabel">Fully Built-up Defense: </p>
