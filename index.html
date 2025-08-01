@@ -62,10 +62,15 @@
             margin: 5px 0;
             font-weight: bold;
         }
-        /* Only added styling */
+        .breakdown {
+            display: block;
+            font-size: 0.85em;
+            color: #aaa;
+            margin-top: 3px;
+            line-height: 1.4;
+        }
         .buff-note {
             color: #FFD700;
-            font-size: 0.9em;
         }
     </style>
 </head>
@@ -73,7 +78,7 @@
     <div class="container">
         <h1>@SearLV's Defense Calculator</h1>
 
-        <!-- Original Inputs -->
+        <!-- Input fields -->
         <label for="def">Unit's Defense Stat:</label>
         <input type="number" id="def">
 
@@ -107,22 +112,14 @@
         <label for="saTimes">Number of Supers:</label>
         <input type="number" id="saTimes" value="1" min="1">
 
-        <!-- New Stacking Inputs -->
         <label for="pastSupers">Past Super Attacks:</label>
         <input type="number" id="pastSupers" value="0" min="0">
-
-        <label for="teamStacker">Team Stacker Buff (%):</label>
-        <input type="number" id="teamStacker" value="0">
-
-        <label for="teamStackerCount">Team Stacker Supers:</label>
-        <input type="number" id="teamStackerCount" value="0" min="0">
 
         <label for="defOnReceiving">Defense when Attacked (%):</label>
         <input type="number" id="defOnReceiving" value="0">
 
         <button id="calculateButton">Calculate</button>
 
-        <!-- Results -->
         <div id="results">
             <p id="sotDefLabel">SoT Defense: </p>
             <p id="fullBuiltDefLabel">Fully Built-up Defense: </p>
