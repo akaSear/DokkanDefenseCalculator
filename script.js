@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('calculateButton').addEventListener('click', () => {
         try {
-            // Retrieve all input values
+            // 1. Collect all inputs
             const def = parseInt(document.getElementById('def').value) || 0;
             const leadSkill = parseInt(document.getElementById('leadSkill').value) || 0;
             const defPass = parseInt(document.getElementById('defPass').value) || 0;
@@ -23,15 +23,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Base defense calculations
+            // 2. Calculate defense stages
             const def1 = Math.floor(def * (leadSkill + 100) / 100);
             const def2 = Math.floor(def1 * (defPass + defSupport + 100) / 100);
             const sotDef = Math.floor(def2 * (defPLinks + 100) / 100);
             const actDef = Math.floor(sotDef * (actSkill + 100) / 100);
             const fullBuiltDef = Math.floor(actDef * (100 + buDefPass) / 100);
-            const staticDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
+            const preSuperDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
+            const preSuperDefWithBuff = defOnReceiving > 0 
+                ? Math.floor(fullBuiltDef * (100 + attackDefense + defOnReceiving) / 100)
+                : null;
 
-            // Stack calculations
+            // 3. Display base stats
+            document.getElementById('sotDefLabel').innerText = 
+                `Start of Turn Defense: ${sotDef.toLocaleString()}`;
+            
+            let fullBuiltText = `Fully Built-up Defense: ${fullBuiltDef.toLocaleString()}`;
+            if (preSuperDefWithBuff) {
+                fullBuiltText += ` <span class="when-attacked">(When Attacked: ${preSuperDefWithBuff.toLocaleString()})</span>`;
+            }
+            document.getElementById('fullBuiltDefLabel').innerHTML = fullBuiltText;
+
+            // 4. Calculate super attack defenses
             const teamStacks = teamStackerBuff * teamStackerCount;
             const pastStacks = pastSupers > 0 ? 
                 (saDefense2 > 0 ? 
@@ -39,67 +52,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     saDefense * pastSupers
                 ) : 0;
 
-            // Calculate defense for each super
             const superDefs = [];
             for (let i = 0; i < saTimes; i++) {
-                let currentStack;
-                if (i === 0) {
-                    currentStack = saDefense;
-                } else if (saDefense2 > 0) {
-                    currentStack = saDefense + (saDefense2 * i);
-                } else {
-                    currentStack = saDefense * (i + 1);
-                }
+                let currentStack = i === 0 ? saDefense : 
+                    (saDefense2 > 0 ? saDefense + (saDefense2 * i) : saDefense * (i + 1));
                 
                 const totalStacks = pastStacks + currentStack + teamStacks;
-                let finalDef = Math.floor(staticDef * (100 + totalStacks) / 100);
-                
-                if (defOnReceiving > 0) {
-                    finalDef = Math.floor(finalDef * (100 + defOnReceiving) / 100);
-                }
-                
-                superDefs.push({
-                    value: finalDef,
-                    base: Math.floor(staticDef * (100 + totalStacks) / 100),
-                    buffAmount: defOnReceiving > 0 ? 
-                        Math.floor(finalDef - (finalDef / (1 + defOnReceiving/100))) : 0
-                });
+                superDefs.push(Math.floor(preSuperDef * (100 + totalStacks) / 100));
             }
 
-            // Display results
-            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString();
-            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
-
+            // 5. Display results
             const superDefPanel = document.getElementById('superDefPanel');
             superDefPanel.innerHTML = '';
             
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
-                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString()}</strong>`;
-                
-                if (defOnReceiving > 0) {
-                    defText += `<span class="breakdown">
-                        (Base: ${def.base.toLocaleString()} + 
-                        ${defOnReceiving}% when attacked: +${def.buffAmount.toLocaleString()})
-                    </span>`;
-                }
-                
-                p.innerHTML = defText;
+                p.innerHTML = `Defense after ${index + 1} Super(s): <strong>${def.toLocaleString()}</strong>`;
                 superDefPanel.appendChild(p);
             });
-
-            // Show total stacks if any
-            const totalStacksUsed = pastStacks + 
-                (saDefense2 > 0 ? 
-                    saDefense + saDefense2 * (saTimes - 1) : 
-                    saDefense * saTimes
-                ) + teamStacks;
-            
-            if (totalStacksUsed > 0) {
-                const stackInfo = document.createElement('p');
-                stackInfo.innerHTML = `Total Stacks Applied: <strong>${totalStacksUsed}%</strong>`;
-                superDefPanel.appendChild(stackInfo);
-            }
 
         } catch (error) {
             alert("An error occurred: " + error.message);
