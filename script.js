@@ -70,14 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString();
             document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
 
-            // NEW: Calculate Defense After Receiving Hit (Before SA)
-            let preSuperDef = staticDef;
-            if (defOnReceiving > 0) {
-                preSuperDef = Math.floor(staticDef * (100 + defOnReceiving) / 100);
-            }
-            document.getElementById('preSuperDefLabel').innerText =
-                "Defense After Receiving Hit (Before SA): " + preSuperDef.toLocaleString();
-
             const superDefPanel = document.getElementById('superDefPanel');
             superDefPanel.innerHTML = '';
             
