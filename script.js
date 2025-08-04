@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Calculate Defense After Receiving Hit (Before SA), including past stacks and team stacker buffs
             const preSuperStacks = pastStacks + teamStacks;
-            let preSuperDef = Math.floor(staticDef * (100 + preSuperStacks) / 100);
+            let preSuperDef = Math.floor(fullBuiltDef * (100 + preSuperStacks) / 100); // Use fullBuiltDef here!
             if (defOnReceiving > 0) {
                 preSuperDef = Math.floor(preSuperDef * (100 + defOnReceiving) / 100);
             }
