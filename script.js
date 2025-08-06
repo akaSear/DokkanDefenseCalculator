@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Display results
             document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString(undefined, { maximumFractionDigits: 0 });
-            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
+            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
             // Calculate Defense After Receiving Hit (Before SA), including past stacks and team stacker buffs
             const preSuperStacks = pastStacks + teamStacks;
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (document.getElementById('preSuperDefLabel')) {
                 document.getElementById('preSuperDefLabel').innerText =
-                    "Defense After Receiving Hit (Before SA): " + preSuperDef.toLocaleString();
+                    "Defense After Receiving Hit (Before SA): " + preSuperDef.toLocaleString(undefined, { maximumFractionDigits: 0 });
             }
 
             const superDefPanel = document.getElementById('superDefPanel');
