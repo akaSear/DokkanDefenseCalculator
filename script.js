@@ -40,29 +40,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 ) : 0;
 
             // Calculate defense for each super
+            const rarity = document.getElementById('rarity').value;
             const superDefs = [];
             for (let i = 0; i < saTimes; i++) {
                 let currentStack;
-                if (i === 0) {
-                    currentStack = saDefense;
-                } else if (saDefense2 > 0) {
-                    currentStack = saDefense + (saDefense2 * i);
+                if (rarity === "LR") {
+                    // LR logic: first super uses saDefense, others use saDefense2 (even if 0)
+                    currentStack = (i === 0) ? saDefense : saDefense2;
                 } else {
-                    currentStack = saDefense * (i + 1);
+                    // TUR logic: all supers use saDefense
+                    currentStack = saDefense;
                 }
-                
-                const totalStacks = pastStacks + currentStack + teamStacks;
-                let finalDef = Math.floor(staticDef * (100 + totalStacks) / 100);
-                
+
+                const totalStacks = pastStacks + (currentStack * (i + 1)) + teamStacks;
+                let finalDef = Math.floor(staticDef * (100 + pastStacks + currentStack + teamStacks) / 100);
+
                 if (defOnReceiving > 0) {
                     finalDef = Math.floor(finalDef * (100 + defOnReceiving) / 100);
                 }
-                
+
                 superDefs.push({
                     value: finalDef,
-                    base: Math.floor(staticDef * (100 + totalStacks) / 100),
-                    buffAmount: defOnReceiving > 0 ? 
-                        Math.floor(finalDef - (finalDef / (1 + defOnReceiving/100))) : 0
+                    base: Math.floor(staticDef * (100 + pastStacks + currentStack + teamStacks) / 100),
+                    buffAmount: defOnReceiving > 0 ?
+                        Math.floor(finalDef - (finalDef / (1 + defOnReceiving / 100))) : 0
                 });
             }
 
@@ -71,18 +72,14 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
 
             // Calculate Defense After Receiving Hit (Before SA), including past stacks and team stacker buffs
-           const preSuperStacks = pastStacks + teamStacks;
-            let preSuperDefBase = Math.floor(fullBuiltDef * (100 + preSuperStacks) / 100); // Exclude attackDefense
-            let preSuperDef = preSuperDefBase;
-            let preSuperBuffAmount = 0;
+            const preSuperStacks = pastStacks + teamStacks;
+            let preSuperDef = Math.floor(staticDef * (100 + preSuperStacks) / 100);
             if (defOnReceiving > 0) {
-                preSuperDef = Math.floor(preSuperDefBase * (100 + defOnReceiving) / 100);
-                preSuperBuffAmount = preSuperDef - preSuperDefBase;
+                preSuperDef = Math.floor(preSuperDef * (100 + defOnReceiving) / 100);
             }
             if (document.getElementById('preSuperDefLabel')) {
-                document.getElementById('preSuperDefLabel').innerHTML =
-                    `Defense After Receiving Hit (Before SA): <strong>${preSuperDef.toLocaleString()}</strong>` +
-                    `<span class="breakdown">(Base: ${preSuperDefBase.toLocaleString()} + ${defOnReceiving}% when attacked: +${preSuperBuffAmount.toLocaleString()})</span>`;
+                document.getElementById('preSuperDefLabel').innerText =
+                    "Defense After Receiving Hit (Before SA): " + preSuperDef.toLocaleString();
             }
 
             const superDefPanel = document.getElementById('superDefPanel');
@@ -119,5 +116,51 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             alert("An error occurred: " + error.message);
         }
+    });
+
+    // Export Inputs
+    document.getElementById('exportButton').addEventListener('click', () => {
+        const inputIds = [
+            'def', 'leadSkill', 'defPass', 'defSupport', 'defPLinks', 'actSkill', 'buDefPass',
+            'defOnReceiving', 'attackDefense', 'saDefense', 'saDefense2', 'saTimes',
+            'pastSupers', 'teamStacker', 'teamStackerCount', 'rarity'
+        ];
+        const data = {};
+        inputIds.forEach(id => {
+            const el = document.getElementById(id);
+            data[id] = el ? el.value : '';
+        });
+        const blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = "dokkan_defense_inputs.json";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    // Import Inputs
+    document.getElementById('importButton').addEventListener('click', () => {
+        document.getElementById('importFile').click();
+    });
+
+    document.getElementById('importFile').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                Object.keys(data).forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.value = data[id];
+                });
+            } catch (err) {
+                alert("Invalid file format.");
+            }
+        };
+        reader.readAsText(file);
     });
 });
