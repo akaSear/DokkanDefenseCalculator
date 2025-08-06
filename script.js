@@ -53,14 +53,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 thisTurnStacks += stackThisSuper;
 
                 const totalStacks = pastStacks + thisTurnStacks + teamStacks;
-                let finalDef = Math.floor(staticDef * (100 + totalStacks) / 100);
-
+                let finalDef = staticDef * (100 + totalStacks) / 100; // NO floor here!
                 if (defOnReceiving > 0) {
-                    finalDef = Math.floor(finalDef * (100 + defOnReceiving) / 100);
+                    finalDef = finalDef * (100 + defOnReceiving) / 100; // NO floor here!
                 }
+                finalDef = Math.floor(finalDef); // Only floor at the end!
                 superDefs.push({
                     value: finalDef,
-                    base: Math.floor(staticDef * (100 + totalStacks) / 100),
+                    base: Math.floor(staticDef * (100 + totalStacks) / 100), // This is fine, as base is before "when attacked"
                     buffAmount: defOnReceiving > 0 ?
                         finalDef - Math.floor(finalDef / (1 + defOnReceiving / 100)) : 0
                 });
@@ -74,7 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const preSuperStacks = pastStacks + teamStacks;
             let preSuperDef = fullBuiltDef * (100 + preSuperStacks) / 100; // NO floor here!
             if (defOnReceiving > 0) {
-                preSuperDef = Math.floor(preSuperDef * (100 + defOnReceiving) / 100);
+                preSuperDef = preSuperDef * (100 + defOnReceiving) / 100; // NO floor here!
+                preSuperDef = Math.floor(preSuperDef); // Only floor at the end!
             }
             if (document.getElementById('preSuperDefLabel')) {
                 document.getElementById('preSuperDefLabel').innerText =
