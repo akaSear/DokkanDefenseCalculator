@@ -103,8 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show total stacks if any
             let totalStacksUsed = pastStacks + teamStacks;
             if (rarity === "LR") {
-                totalStacksUsed += saDefense + saDefense2 * (saTimes - 1);
+                // LR: first super uses saDefense, others use saDefense2 (even if 0)
+                totalStacksUsed += saDefense; // first super
+                if (saTimes > 1) {
+                    totalStacksUsed += saDefense2 * (saTimes - 1); // additional supers
+                }
             } else {
+                // TUR: all supers use saDefense
                 totalStacksUsed += saDefense * saTimes;
             }
             
