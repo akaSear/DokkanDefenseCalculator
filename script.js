@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 thisTurnStacks += stackThisSuper;
 
                 const totalStacks = pastStacks + thisTurnStacks + teamStacks;
-                let finalDef = Math.floor(staticDef * (100 + totalStacks) / 100);
+                let finalDef = staticDef * (100 + totalStacks) / 100;
 
                 if (defOnReceiving > 0) {
                     finalDef = Math.floor(finalDef * (100 + defOnReceiving) / 100);
@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Calculate Defense After Receiving Hit (Before SA), including past stacks and team stacker buffs
             const preSuperStacks = pastStacks + teamStacks;
-            let preSuperDef = Math.floor(staticDef * (100 + preSuperStacks) / 100);
+            let preSuperDef = Math.floor(fullBuiltDef * (100 + preSuperStacks) / 100);
             if (defOnReceiving > 0) {
                 preSuperDef = Math.floor(preSuperDef * (100 + defOnReceiving) / 100);
             }
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
-                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString()}</strong>`;
+                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString(undefined, {maximumFractionDigits: 1})}</strong>`;
                 
                 if (defOnReceiving > 0) {
                     defText += `<span class="breakdown">
