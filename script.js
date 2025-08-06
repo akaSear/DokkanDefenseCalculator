@@ -42,18 +42,18 @@ document.addEventListener('DOMContentLoaded', () => {
             // Calculate defense for each super
             const rarity = document.getElementById('rarity').value;
             const superDefs = [];
+            let thisTurnStacks = 0;
             for (let i = 0; i < saTimes; i++) {
-                let currentStack;
+                let stackThisSuper;
                 if (rarity === "LR") {
-                    // LR logic: first super uses saDefense, others use saDefense2 (even if 0)
-                    currentStack = (i === 0) ? saDefense : saDefense2;
+                    stackThisSuper = (i === 0) ? saDefense : saDefense2;
                 } else {
-                    // TUR logic: all supers use saDefense
-                    currentStack = saDefense;
+                    stackThisSuper = saDefense;
                 }
+                thisTurnStacks += stackThisSuper;
 
-                const totalStacks = pastStacks + (currentStack * (i + 1)) + teamStacks;
-                let finalDef = Math.floor(staticDef * (100 + pastStacks + currentStack + teamStacks) / 100);
+                const totalStacks = pastStacks + thisTurnStacks + teamStacks;
+                let finalDef = Math.floor(staticDef * (100 + totalStacks) / 100);
 
                 if (defOnReceiving > 0) {
                     finalDef = Math.floor(finalDef * (100 + defOnReceiving) / 100);
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 superDefs.push({
                     value: finalDef,
-                    base: Math.floor(staticDef * (100 + pastStacks + currentStack + teamStacks) / 100),
+                    base: Math.floor(staticDef * (100 + totalStacks) / 100),
                     buffAmount: defOnReceiving > 0 ?
                         Math.floor(finalDef - (finalDef / (1 + defOnReceiving / 100))) : 0
                 });
