@@ -67,19 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Display results
-            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString();
-            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
+            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString(undefined, { maximumFractionDigits: 0 });
+            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString(undefined, { maximumFractionDigits: 0 });
 
-            // Calculate Defense After Receiving Hit (Before SA), including past stacks and team stacker buffs
-            const preSuperStacks = pastStacks + teamStacks;
-            let preSuperDef = fullBuiltDef * (100 + preSuperStacks) / 100; // NO floor here!
-            if (defOnReceiving > 0) {
-                preSuperDef = preSuperDef * (100 + defOnReceiving) / 100; // NO floor here!
-                preSuperDef = Math.floor(preSuperDef); // Only floor at the end!
-            }
             if (document.getElementById('preSuperDefLabel')) {
                 document.getElementById('preSuperDefLabel').innerText =
-                    "Defense After Receiving Hit (Before SA): " + preSuperDef.toLocaleString();
+                    "Defense After Receiving Hit (Before SA): " + preSuperDef.toLocaleString(undefined, { maximumFractionDigits: 0 });
             }
 
             const superDefPanel = document.getElementById('superDefPanel');
@@ -87,10 +80,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
-                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString()}</strong>`;
+                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</strong>`;
                 defText += `<span class="breakdown">
-                    (Base: ${def.base.toLocaleString()} + 
-                    ${defOnReceiving}% when attacked: +${Math.floor(def.buffAmount).toLocaleString()})
+                    (Base: ${def.base.toLocaleString(undefined, { maximumFractionDigits: 0 })} + 
+                    ${defOnReceiving}% when attacked: +${def.buffAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })})
                 </span>`;
                 p.innerHTML = defText;
                 superDefPanel.appendChild(p);
