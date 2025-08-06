@@ -86,14 +86,11 @@ document.addEventListener('DOMContentLoaded', () => {
             
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
-                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString(undefined, {maximumFractionDigits: 0})}</strong>`;
-                
-                if (defOnReceiving > 0) {
-                    defText += `<span class="breakdown">
-                        (Base: ${def.base.toLocaleString()} + 
-                        ${defOnReceiving}% when attacked: +${def.buffAmount.toLocaleString()})
-                    </span>`;
-                }
+                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</strong>`;
+                defText += `<span class="breakdown">
+                    (Base: ${def.base.toLocaleString(undefined, { maximumFractionDigits: 0 })} + 
+                    ${defOnReceiving}% when attacked: +${def.buffAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })})
+                </span>`;
                 
                 p.innerHTML = defText;
                 superDefPanel.appendChild(p);
