@@ -35,7 +35,7 @@
             margin: 10px 0 5px;
             font-weight: bold;
         }
-        input[type="number"], button {
+        input[type="number"], button, select {
             width: 100%;
             padding: 10px;
             margin-bottom: 10px;
@@ -102,10 +102,6 @@
         <label for="buDefPass">Defense from Build-ups:</label>
         <input type="number" id="buDefPass">
 
-                <!-- NEW: Defense when attacked -->
-        <label for="defOnReceiving">Defense when Attacked (%):</label>
-        <input type="number" id="defOnReceiving" value="0">
-
         <label for="attackDefense">Defense on Super/Attack:</label>
         <input type="number" id="attackDefense">
 
@@ -128,9 +124,22 @@
         <label for="teamStackerCount">Team Stacker Supers:</label>
         <input type="number" id="teamStackerCount" value="0" min="0">
 
+        <!-- NEW: Defense when attacked -->
+        <label for="defOnReceiving">Defense when Attacked (%):</label>
+        <input type="number" id="defOnReceiving" value="0">
+
+        <!-- NEW: Unit Rarity -->
+        <label for="rarity">Unit Rarity:</label>
+        <select id="rarity">
+            <option value="TUR">TUR</option>
+            <option value="LR">LR</option>
+        </select>
 
         <!-- Calculate button -->
         <button id="calculateButton">Calculate</button>
+        <button id="exportButton" type="button">Export Inputs</button>
+        <button id="importButton" type="button">Import Inputs</button>
+        <input type="file" id="importFile" style="display:none" accept=".json">
 
         <!-- Results -->
         <div id="results">
