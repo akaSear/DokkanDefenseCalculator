@@ -23,10 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Base defense calculations (Dokkan-style: floor at each step EXCEPT links)
+            // Base defense calculations (NO FLOORING)
             const def1 = def * (leadSkill + 100) / 100;
             const def2 = def1 * (defPass + defSupport + 100) / 100;
-            const sotDef = def2 * (defPLinks + 100) / 100; // NO floor here!
+            const sotDef = def2 * (defPLinks + 100) / 100;
             const actDef = sotDef * (actSkill + 100) / 100;
             const fullBuiltDef = actDef * (100 + buDefPass) / 100;
             const staticDef = fullBuiltDef * (100 + attackDefense) / 100;
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 preSuperDef = preSuperDef * (100 + defOnReceiving) / 100;
             }
 
-            // Display results (floor only here)
+            // Display results (FLOOR ONLY HERE)
             document.getElementById('sotDefLabel').innerText = "SoT Defense: " + Math.floor(sotDef).toLocaleString();
             document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + Math.floor(fullBuiltDef).toLocaleString();
 
