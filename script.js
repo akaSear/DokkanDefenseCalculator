@@ -23,10 +23,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Base defense calculations (Dokkan-style: floor at each step)
+            // Base defense calculations (Dokkan-style: floor at each step EXCEPT links)
             const def1 = Math.floor(def * (leadSkill + 100) / 100);
             const def2 = Math.floor(def1 * (defPass + defSupport + 100) / 100);
-            const sotDef = Math.floor(def2 * (defPLinks + 100) / 100);
+            const sotDef = def2 * (defPLinks + 100) / 100; // NO floor here!
             const actDef = Math.floor(sotDef * (actSkill + 100) / 100);
             const fullBuiltDef = Math.floor(actDef * (100 + buDefPass) / 100);
             const staticDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Calculate Defense After Receiving Hit (Before SA), including past stacks and team stacker buffs
             const preSuperStacks = pastStacks + teamStacks;
-            let preSuperDef = Math.floor(fullBuiltDef * (100 + preSuperStacks) / 100);
+            let preSuperDef = fullBuiltDef * (100 + preSuperStacks) / 100; // NO floor here!
             if (defOnReceiving > 0) {
                 preSuperDef = Math.floor(preSuperDef * (100 + defOnReceiving) / 100);
             }
