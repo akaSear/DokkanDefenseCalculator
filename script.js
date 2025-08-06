@@ -67,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Display results
-            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString(undefined, { maximumFractionDigits: 0 });
-            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString(undefined, { maximumFractionDigits: 0 });
+            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + Math.floor(sotDef).toLocaleString();
+            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + Math.floor(fullBuiltDef).toLocaleString();
 
             // Calculate Defense After Receiving Hit (Before SA), including past stacks and team stacker buffs
             const preSuperStacks = pastStacks + teamStacks;
@@ -78,20 +78,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             if (document.getElementById('preSuperDefLabel')) {
                 document.getElementById('preSuperDefLabel').innerText =
-                    "Defense After Receiving Hit (Before SA): " + preSuperDef.toLocaleString(undefined, { maximumFractionDigits: 0 });
+                    "Defense After Receiving Hit (Before SA): " + Math.floor(preSuperDef).toLocaleString();
             }
 
             const superDefPanel = document.getElementById('superDefPanel');
             superDefPanel.innerHTML = '';
-            
+
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
-                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</strong>`;
+                let defText = `Defense after ${index + 1} Super(s): <strong>${Math.floor(def.value).toLocaleString()}</strong>`;
                 defText += `<span class="breakdown">
-                    (Base: ${def.base.toLocaleString(undefined, { maximumFractionDigits: 0 })} + 
-                    ${defOnReceiving}% when attacked: +${def.buffAmount.toLocaleString(undefined, { maximumFractionDigits: 0 })})
+                    (Base: ${Math.floor(def.base).toLocaleString()} + 
+                    ${defOnReceiving}% when attacked: +${Math.floor(def.buffAmount).toLocaleString()})
                 </span>`;
-                
                 p.innerHTML = defText;
                 superDefPanel.appendChild(p);
             });
@@ -108,10 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // TUR: all supers use saDefense
                 totalStacksUsed += saDefense * saTimes;
             }
-            
+
             if (totalStacksUsed > 0) {
                 const stackInfo = document.createElement('p');
-                stackInfo.innerHTML = `Total Stacks Applied: <strong>${totalStacksUsed}%</strong>`;
+                stackInfo.innerHTML = `Total Stacks Applied: <strong>${Math.floor(totalStacksUsed).toLocaleString()}%</strong>`;
                 superDefPanel.appendChild(stackInfo);
             }
 
