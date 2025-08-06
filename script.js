@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Display results
-            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString(undefined, { maximumFractionDigits: 1 });
+            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString(undefined, { maximumFractionDigits: 0 });
             document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
 
             // Calculate Defense After Receiving Hit (Before SA), including past stacks and team stacker buffs
@@ -86,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
-                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString(undefined, {maximumFractionDigits: 1})}</strong>`;
+                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString(undefined, {maximumFractionDigits: 0})}</strong>`;
                 
                 if (defOnReceiving > 0) {
                     defText += `<span class="breakdown">
