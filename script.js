@@ -28,8 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const def2 = Math.floor(def1 * (defPass + defSupport + 100) / 100);
             const sotDef = def2 * (defPLinks + 100) / 100; // NO floor here!
             const actDef = Math.floor(sotDef * (actSkill + 100) / 100);
-            const fullBuiltDef = Math.floor(actDef * (100 + buDefPass) / 100);
-            const staticDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
+            const fullBuiltDef = actDef * (100 + buDefPass) / 100; // NO floor here!
+            const staticDef = fullBuiltDef * (100 + attackDefense) / 100; // NO floor here!
 
             // Stack calculations
             const teamStacks = teamStackerBuff * teamStackerCount;
@@ -57,20 +57,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (defOnReceiving > 0) {
                     finalDef = finalDef * (100 + defOnReceiving) / 100; // NO floor here!
                 }
-                finalDef = Math.floor(finalDef); // Only floor at the end!
                 superDefs.push({
-                    value: finalDef,
-                    base: Math.floor(staticDef * (100 + totalStacks) / 100), // This is fine, as base is before "when attacked"
+                    value: Math.floor(finalDef),
+                    base: Math.floor(staticDef * (100 + totalStacks) / 100),
                     buffAmount: defOnReceiving > 0 ?
-                        finalDef - Math.floor(finalDef / (1 + defOnReceiving / 100)) : 0
+                        Math.floor(finalDef) - Math.floor(finalDef / (1 + defOnReceiving / 100)) : 0
                 });
             }
 
             // Calculate Defense After Receiving Hit (Before SA)
             const preSuperStacks = pastStacks + teamStacks;
-            let preSuperDef = Math.floor(fullBuiltDef * (100 + preSuperStacks) / 100);
+            let preSuperDef = fullBuiltDef * (100 + preSuperStacks) / 100;
             if (defOnReceiving > 0) {
-                preSuperDef = Math.floor(preSuperDef * (100 + defOnReceiving) / 100);
+                preSuperDef = preSuperDef * (100 + defOnReceiving) / 100;
             }
 
             // Display results (always as whole numbers)
@@ -87,10 +86,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
-                let defText = `Defense after ${index + 1} Super(s): <strong>${Math.floor(def.value).toLocaleString()}</strong>`;
+                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString()}</strong>`;
                 defText += `<span class="breakdown">
-                    (Base: ${Math.floor(def.base).toLocaleString()} + 
-                    ${defOnReceiving}% when attacked: +${Math.floor(def.buffAmount).toLocaleString()})
+                    (Base: ${def.base.toLocaleString()} + 
+                    ${defOnReceiving}% when attacked: +${def.buffAmount.toLocaleString()})
                 </span>`;
                 p.innerHTML = defText;
                 superDefPanel.appendChild(p);
