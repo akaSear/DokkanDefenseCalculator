@@ -24,12 +24,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Base defense calculations
-            const def1 = Math.floor(def * (leadSkill + 100) / 100);
-            const def2 = Math.floor(def1 * (defPass + defSupport + 100) / 100);
-            const sotDef = Math.floor(def2 * (defPLinks + 100) / 100);
-            const actDef = Math.floor(sotDef * (actSkill + 100) / 100);
-            const fullBuiltDef = Math.floor(actDef * (100 + buDefPass) / 100);
-            const staticDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
+            const def1 = def * (leadSkill + 100) / 100;
+            const def2 = def1 * (defPass + defSupport + 100) / 100;
+            const sotDef = def2 * (defPLinks + 100) / 100;
+            const actDef = sotDef * (actSkill + 100) / 100;
+            const fullBuiltDef = actDef * (100 + buDefPass) / 100;
+            const staticDef = fullBuiltDef * (100 + attackDefense) / 100;
 
             // Stack calculations
             const teamStacks = teamStackerBuff * teamStackerCount;
@@ -56,26 +56,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 let finalDef = staticDef * (100 + totalStacks) / 100;
 
                 if (defOnReceiving > 0) {
-                    finalDef = Math.floor(finalDef * (100 + defOnReceiving) / 100);
+                    finalDef = finalDef * (100 + defOnReceiving) / 100;
                 }
-
                 superDefs.push({
                     value: finalDef,
-                    base: Math.floor(staticDef * (100 + totalStacks) / 100),
+                    base: staticDef * (100 + totalStacks) / 100,
                     buffAmount: defOnReceiving > 0 ?
-                        Math.floor(finalDef - (finalDef / (1 + defOnReceiving / 100))) : 0
+                        finalDef - (finalDef / (1 + defOnReceiving / 100)) : 0
                 });
             }
 
             // Display results
-            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString();
+            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString(undefined, { maximumFractionDigits: 1 });
             document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
 
             // Calculate Defense After Receiving Hit (Before SA), including past stacks and team stacker buffs
             const preSuperStacks = pastStacks + teamStacks;
-            let preSuperDef = Math.floor(fullBuiltDef * (100 + preSuperStacks) / 100);
+            let preSuperDef = fullBuiltDef * (100 + preSuperStacks) / 100;
             if (defOnReceiving > 0) {
-                preSuperDef = Math.floor(preSuperDef * (100 + defOnReceiving) / 100);
+                preSuperDef = preSuperDef * (100 + defOnReceiving) / 100;
             }
             if (document.getElementById('preSuperDefLabel')) {
                 document.getElementById('preSuperDefLabel').innerText =
