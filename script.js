@@ -23,13 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Base defense calculations
-            const def1 = def * (leadSkill + 100) / 100;
-            const def2 = def1 * (defPass + defSupport + 100) / 100;
-            const sotDef = def2 * (defPLinks + 100) / 100;
-            const actDef = sotDef * (actSkill + 100) / 100;
-            const fullBuiltDef = actDef * (100 + buDefPass) / 100;
-            const staticDef = fullBuiltDef * (100 + attackDefense) / 100;
+            // Base defense calculations (Dokkan-style: floor at each step)
+            const def1 = Math.floor(def * (leadSkill + 100) / 100);
+            const def2 = Math.floor(def1 * (defPass + defSupport + 100) / 100);
+            const sotDef = Math.floor(def2 * (defPLinks + 100) / 100);
+            const actDef = Math.floor(sotDef * (actSkill + 100) / 100);
+            const fullBuiltDef = Math.floor(actDef * (100 + buDefPass) / 100);
+            const staticDef = Math.floor(fullBuiltDef * (100 + attackDefense) / 100);
 
             // Stack calculations
             const teamStacks = teamStackerBuff * teamStackerCount;
@@ -53,32 +53,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 thisTurnStacks += stackThisSuper;
 
                 const totalStacks = pastStacks + thisTurnStacks + teamStacks;
-                let finalDef = staticDef * (100 + totalStacks) / 100;
+                let finalDef = Math.floor(staticDef * (100 + totalStacks) / 100);
 
                 if (defOnReceiving > 0) {
-                    finalDef = finalDef * (100 + defOnReceiving) / 100;
+                    finalDef = Math.floor(finalDef * (100 + defOnReceiving) / 100);
                 }
                 superDefs.push({
                     value: finalDef,
-                    base: staticDef * (100 + totalStacks) / 100,
+                    base: Math.floor(staticDef * (100 + totalStacks) / 100),
                     buffAmount: defOnReceiving > 0 ?
-                        finalDef - (finalDef / (1 + defOnReceiving / 100)) : 0
+                        finalDef - Math.floor(finalDef / (1 + defOnReceiving / 100)) : 0
                 });
             }
 
             // Display results
-            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + Math.floor(sotDef).toLocaleString();
-            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + Math.floor(fullBuiltDef).toLocaleString();
+            document.getElementById('sotDefLabel').innerText = "SoT Defense: " + sotDef.toLocaleString();
+            document.getElementById('fullBuiltDefLabel').innerText = "Fully Built-up SoT Defense: " + fullBuiltDef.toLocaleString();
 
             // Calculate Defense After Receiving Hit (Before SA), including past stacks and team stacker buffs
             const preSuperStacks = pastStacks + teamStacks;
-            let preSuperDef = fullBuiltDef * (100 + preSuperStacks) / 100;
+            let preSuperDef = Math.floor(fullBuiltDef * (100 + preSuperStacks) / 100);
             if (defOnReceiving > 0) {
-                preSuperDef = preSuperDef * (100 + defOnReceiving) / 100;
+                preSuperDef = Math.floor(preSuperDef * (100 + defOnReceiving) / 100);
             }
             if (document.getElementById('preSuperDefLabel')) {
                 document.getElementById('preSuperDefLabel').innerText =
-                    "Defense After Receiving Hit (Before SA): " + Math.floor(preSuperDef).toLocaleString();
+                    "Defense After Receiving Hit (Before SA): " + preSuperDef.toLocaleString();
             }
 
             const superDefPanel = document.getElementById('superDefPanel');
@@ -86,9 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             superDefs.forEach((def, index) => {
                 const p = document.createElement('p');
-                let defText = `Defense after ${index + 1} Super(s): <strong>${Math.floor(def.value).toLocaleString()}</strong>`;
+                let defText = `Defense after ${index + 1} Super(s): <strong>${def.value.toLocaleString()}</strong>`;
                 defText += `<span class="breakdown">
-                    (Base: ${Math.floor(def.base).toLocaleString()} + 
+                    (Base: ${def.base.toLocaleString()} + 
                     ${defOnReceiving}% when attacked: +${Math.floor(def.buffAmount).toLocaleString()})
                 </span>`;
                 p.innerHTML = defText;
