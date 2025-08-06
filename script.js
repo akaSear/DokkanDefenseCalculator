@@ -101,11 +101,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             // Show total stacks if any
-            const totalStacksUsed = pastStacks + 
-                (saDefense2 > 0 ? 
-                    saDefense + saDefense2 * (saTimes - 1) : 
-                    saDefense * saTimes
-                ) + teamStacks;
+            let totalStacksUsed = pastStacks + teamStacks;
+            if (rarity === "LR") {
+                totalStacksUsed += saDefense + saDefense2 * (saTimes - 1);
+            } else {
+                totalStacksUsed += saDefense * saTimes;
+            }
             
             if (totalStacksUsed > 0) {
                 const stackInfo = document.createElement('p');
